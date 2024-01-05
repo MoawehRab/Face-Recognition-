@@ -19,7 +19,7 @@ I'm a passionate computer engineer with expertise in networking, some cybersecur
 
 ### [Criminal Identification using Face Recognition based on Machine Learning]
 
-The project focuses on the development of a Face Recognition system specifically designed for criminal identification but it can also work with other group of people.
+The project focuses on the development of a Face Recognition system specifically designed for criminal identification but it can also work with other groups of people.
 
 
 
