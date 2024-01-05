@@ -1,0 +1,124 @@
+
+import numpy as np
+import tensorflow as tf
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense 
+from tensorflow.keras.preprocessing.image import ImageDataGenerator, load_img, img_to_array
+from keras.preprocessing import image
+from tensorflow.keras.regularizers import l2
+
+
+
+
+# Define paths for training and testing data
+train_data_dir=r'C:\Users\Acer\Desktop\gradpro\TrainningSet'
+
+
+
+#--------------------------------------------------------------------
+#--------------------------------------------------------------------
+#--------------------------------------------------------------------
+#--------------------------------------------------------------------
+
+
+img_width, img_height = 200, 200
+batch_size = 32
+
+train_datagen = ImageDataGenerator(
+     shear_range=0.1,
+    zoom_range=0.1,
+    horizontal_flip=True)
+
+test_datagen = ImageDataGenerator()
+
+train_generator = train_datagen.flow_from_directory(
+    train_data_dir,
+    target_size=(img_width, img_height),
+    batch_size=batch_size,
+    class_mode='categorical'
+)
+
+test_generator = test_datagen.flow_from_directory(
+    train_data_dir,
+    target_size=(img_width, img_height),
+    batch_size=batch_size,
+    class_mode='categorical'
+)
+
+
+
+#--------------------------------------------------------------------
+#--------------------------------------------------------------------
+#--------------------------------------------------------------------
+#--------------------------------------------------------------------
+
+
+
+resultMap = {v: k for k, v in train_generator.class_indices.items()}
+print("Mapping of Face and its ID:\n", resultMap,"\n")
+OutputNeurons=len(resultMap)
+print('\n The Number of output neurons: ', OutputNeurons)
+
+#--------------------------------------------------------------------
+#--------------------------------------------------------------------
+#--------------------------------------------------------------------
+#--------------------------------------------------------------------
+
+
+# Build the CNN model
+model = tf.keras.Sequential([
+    Conv2D(32, (5, 5), activation='relu',strides=(1, 1), input_shape=(img_width, img_height, 3)),
+    MaxPooling2D((2, 2)),
+    Conv2D(64, (5, 5), activation='relu',strides=(1, 1)),
+    MaxPooling2D((2, 2)),
+    Conv2D(128, (5, 5), activation='relu',strides=(1, 1)),
+    Conv2D(128, (5, 5), activation='relu',strides=(1, 1)),
+    MaxPooling2D((2, 2)),
+    Flatten(),
+    Dense(128, activation='relu', kernel_regularizer=l2(0.01)),
+    Dense(train_generator.num_classes, activation='softmax')
+])
+
+# Compile the model
+
+model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+
+# Train the model
+epochs = 25
+model.fit(train_generator, epochs=epochs, validation_data=test_generator)
+
+# Evaluate the model
+loss, accuracy = model.evaluate(test_generator)
+print(f'Test accuracy: {accuracy * 100:.2f}%')
+#--------------------------------------------------------------------
+#--------------------------------------------------------------------
+#--------------------------------------------------------------------
+#--------------------------------------------------------------------
+'''########### single predictions ###########'''
+
+while True:
+    fName = input("Enter the face Name (e.g., face15): ")
+    if fName.lower() == 'exit':
+        print("Exiting the loop.")
+        break
+    imgNum=input ("Enter the image number:")
+    #"C:\Users\Acer\Desktop\gradpro\Face-Images\Face Images\Final Testing Images\face1\face1 (2).jpg"
+    imgPath = r'C:\Users\Acer\Desktop\gradpro\TestingSet/' + fName + '/' + fName +' ('+imgNum +  ').jpg'
+    try:
+        testImg = load_img(imgPath, target_size=(200, 200))
+        testImg = img_to_array(testImg)
+        testImg = np.expand_dims(testImg, axis=0)
+
+        result=model.predict(testImg,verbose=0)
+        predicted_class = np.argmax(result)
+        
+        print('----' * 10)
+        print('Prediction is: ', resultMap[np.argmax(result)])
+        print('----' * 10)
+
+   
+        
+    except FileNotFoundError:
+        print(f"Image {fName} ({imgNum}) not found.")    
+     
+
+  
