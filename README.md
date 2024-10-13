@@ -25,5 +25,5 @@ The project focuses on the development of a Face Recognition system specifically
 
 ## 📫 Get in Touch
 
-- Email: [My Email Address](moaweh9rab@gmail.com)
+- Email: (moaweh9rab@gmail.com)
 
